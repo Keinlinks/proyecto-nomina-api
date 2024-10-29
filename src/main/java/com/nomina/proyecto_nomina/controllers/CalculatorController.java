@@ -2,11 +2,7 @@ package com.nomina.proyecto_nomina.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nomina.proyecto_nomina.classes.Afp;
-import com.nomina.proyecto_nomina.classes.CapitalAfp;
-import com.nomina.proyecto_nomina.classes.CuprumAfp;
-import com.nomina.proyecto_nomina.classes.HabitatAfp;
-import com.nomina.proyecto_nomina.classes.NominalSalary;
+import com.nomina.proyecto_nomina.classes.*;
 
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,6 +41,26 @@ public class CalculatorController {
             case "Habitat":
                 HabitatAfp habitatAfp = new HabitatAfp();
                 afp = new Afp(habitatAfp);
+                deducction = afp.calculateAfp(salary_hours_bonus);
+                break;
+            case "Modelo":
+                ModeloAfp modeloAfp = new ModeloAfp();
+                afp = new Afp(modeloAfp);
+                deducction = afp.calculateAfp(salary_hours_bonus);
+                break;
+            case "PlanVital":
+                PlanVitalAfp planVitalAfp = new PlanVitalAfp();
+                afp = new Afp(planVitalAfp);
+                deducction = afp.calculateAfp(salary_hours_bonus);
+                break;
+            case "Provida":
+                ProvidaAfp providaAfp = new ProvidaAfp();
+                afp = new Afp(providaAfp);
+                deducction = afp.calculateAfp(salary_hours_bonus);
+                break;
+            case "Uno":
+                UnoAfp unoAfp = new UnoAfp();
+                afp = new Afp(unoAfp);
                 deducction = afp.calculateAfp(salary_hours_bonus);
                 break;
             default:
