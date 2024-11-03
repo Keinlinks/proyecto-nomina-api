@@ -1,4 +1,4 @@
-package com.nomina.proyecto_nomina.classes;
+package com.nomina.proyecto_nomina.Afp_classes;
 
 import com.nomina.proyecto_nomina.interfaces.AfpStrategy;
 
@@ -14,6 +14,6 @@ public class Afp {
     public double calculateAfp(double salary) {
         double deduccionAfp = afpStrategy.calculateAfp(salary);
 
-        return salary - deduccionAfp;
+        return deduccionAfp;
     }
 }

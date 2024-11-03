@@ -1,4 +1,4 @@
-package com.nomina.proyecto_nomina.classes;
+package com.nomina.proyecto_nomina.Afp_classes;
 
 public class Constants {
     public static final double RENTA_IMPONIBLE = 0.10;

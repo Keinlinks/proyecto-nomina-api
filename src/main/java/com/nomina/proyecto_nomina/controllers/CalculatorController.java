@@ -2,10 +2,16 @@ package com.nomina.proyecto_nomina.controllers;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import com.nomina.proyecto_nomina.classes.*;
-
+import com.nomina.proyecto_nomina.Afp_classes.*;
+import com.nomina.proyecto_nomina.classes_pojo.NominalSalary;
+import com.nomina.proyecto_nomina.classes_pojo.Nominal_response;
+import com.nomina.proyecto_nomina.health_system.Fonasa;
+import com.nomina.proyecto_nomina.health_system.Isapre;
+import com.nomina.proyecto_nomina.services.Afp_fabric;
+import com.nomina.proyecto_nomina.services.Unique_rent;
+import com.nomina.proyecto_nomina.interfaces.HealthSystemStrategy;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,59 +20,49 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/calculator")
 @CrossOrigin(origins = "http://localhost:4200")
 public class CalculatorController {
-    
-    @GetMapping("/")
-    public String getMethodName() {
-        return "hola";
-    }
+    @Autowired
+    private Afp_fabric afp_fabric;
+
+    @Autowired
+    private Unique_rent unique_rent;
 
     @PostMapping("nominaSalary")
-    public String nomina(@RequestBody NominalSalary entity) {
-        int salary_hours = entity.salary * entity.hours;
-        int salary_hours_bonus = salary_hours + entity.bonus;
-        double deducction= 0;
+    public Nominal_response nomina(@RequestBody NominalSalary entity) {
+        //se inicia el objeto de la clase nominal_response
+        Nominal_response nominal_response = new Nominal_response(entity.salary_per_day, entity.day_worked, entity.bonus, entity.extra_hours, entity.extra_price_per_hour, entity.afp, entity.health_system);
+
+        //se calcula el salario imponible el cual se sometera a los descuentos
+        nominal_response.setImponible_salary((nominal_response.salary_per_day * nominal_response.day_worked) + nominal_response.bonus + nominal_response.extra_hours * nominal_response.extra_price_per_hour);
+
+        //se calcula el tax de afp
 
         Afp afp;
-        switch(entity.afp){
-            case "Capital":
-                CapitalAfp capitalAfp = new CapitalAfp();
-                afp = new Afp(capitalAfp);
-                deducction = afp.calculateAfp(salary_hours_bonus);
+        afp = afp_fabric.getAfp(entity.afp);
+        int tax_afp = (int) Math.ceil(afp.calculateAfp(nominal_response.getImponible_salary()));
+        nominal_response.setAfp_tax(tax_afp);
+        
+        //se calcula el tax de health system
+        switch (entity.health_system) {
+            case "FONASA":
+                HealthSystemStrategy healthSystemStrategy = new Fonasa();
+                int tax_healthSystem = healthSystemStrategy.calculateHealthSystem(nominal_response.getImponible_salary());
+                nominal_response.setHealth_system_tax(tax_healthSystem);
                 break;
-            case "Cuprum":
-                CuprumAfp cuprumAfp = new CuprumAfp();
-                afp = new Afp(cuprumAfp);
-                deducction = afp.calculateAfp(salary_hours_bonus);
-                break;
-            case "Habitat":
-                HabitatAfp habitatAfp = new HabitatAfp();
-                afp = new Afp(habitatAfp);
-                deducction = afp.calculateAfp(salary_hours_bonus);
-                break;
-            case "Modelo":
-                ModeloAfp modeloAfp = new ModeloAfp();
-                afp = new Afp(modeloAfp);
-                deducction = afp.calculateAfp(salary_hours_bonus);
-                break;
-            case "PlanVital":
-                PlanVitalAfp planVitalAfp = new PlanVitalAfp();
-                afp = new Afp(planVitalAfp);
-                deducction = afp.calculateAfp(salary_hours_bonus);
-                break;
-            case "Provida":
-                ProvidaAfp providaAfp = new ProvidaAfp();
-                afp = new Afp(providaAfp);
-                deducction = afp.calculateAfp(salary_hours_bonus);
-                break;
-            case "Uno":
-                UnoAfp unoAfp = new UnoAfp();
-                afp = new Afp(unoAfp);
-                deducction = afp.calculateAfp(salary_hours_bonus);
+            case "ISAPRE":
+                HealthSystemStrategy healthSystemStrategy1 = new Isapre();
+                int tax_healthSystem1 = healthSystemStrategy1.calculateHealthSystem(nominal_response.getImponible_salary());
+                nominal_response.setHealth_system_tax(tax_healthSystem1);
                 break;
             default:
                 break;
         }
-        int deducction_int = (int) Math.ceil(deducction);
-        return String.valueOf(deducction_int);
+        nominal_response.calculateImponibleRent();
+
+        //se calcula el tax de rent
+        int tax_rent = unique_rent.get_rent_tax(nominal_response.getImponible_rent());
+        nominal_response.setRent_tax(tax_rent);
+        //
+        nominal_response.calculateLiquidSalary();
+        return nominal_response;
     }
 }
