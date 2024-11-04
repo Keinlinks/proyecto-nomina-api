@@ -43,12 +43,12 @@ public class CalculatorController {
         
         //se calcula el tax de health system
         switch (entity.health_system) {
-            case "FONASA":
+            case "Fonasa":
                 HealthSystemStrategy healthSystemStrategy = new Fonasa();
                 int tax_healthSystem = healthSystemStrategy.calculateHealthSystem(nominal_response.getImponible_salary());
                 nominal_response.setHealth_system_tax(tax_healthSystem);
                 break;
-            case "ISAPRE":
+            case "Isapre":
                 HealthSystemStrategy healthSystemStrategy1 = new Isapre();
                 int tax_healthSystem1 = healthSystemStrategy1.calculateHealthSystem(nominal_response.getImponible_salary());
                 nominal_response.setHealth_system_tax(tax_healthSystem1);
