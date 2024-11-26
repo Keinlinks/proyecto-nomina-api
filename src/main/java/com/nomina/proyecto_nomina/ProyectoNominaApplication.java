@@ -1,5 +1,7 @@
 package com.nomina.proyecto_nomina;
 
+import java.util.Collections;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -14,7 +16,10 @@ import com.mongodb.client.MongoClients;
 public class ProyectoNominaApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ProyectoNominaApplication.class, args);
+		SpringApplication app = new SpringApplication(ProyectoNominaApplication.class);
+    app.setDefaultProperties(Collections
+          .singletonMap("server.port", "8081"));
+        app.run(args);
 	}
 }
 

@@ -75,6 +75,7 @@ public class DbService {
         updatedUser.setAfp(user.getAfp());
         updatedUser.setBirth_date(user.getBirth_date());
         updatedUser.setDiscapacity(user.isDiscapacity());
+        updatedUser.setEntry_date(user.getEntry_date());
         updatedUser.setExit_date(user.getExit_date());
         updatedUser.setHealth_system(user.getHealth_system());
         updatedUser.setName(user.getName());
